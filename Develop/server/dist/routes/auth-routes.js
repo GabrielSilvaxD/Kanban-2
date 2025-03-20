@@ -1,25 +1,21 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/index.js';
+import { User } from '../models/index.js'; // Adjust path as needed
 import bcrypt from 'bcrypt';
-import dotenv from 'dotenv';
-// Load environment variables
-dotenv.config();
 const router = Router();
-// Login route
 router.post('/login', async (req, res) => {
     try {
-        // Extract username and password from request body
+        // Ensure JWT_SECRET exists
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({ message: 'Server configuration error: JWT_SECRET is missing' });
+        }
         const { username, password } = req.body;
         // Validate input
         if (!username || !password) {
             return res.status(400).json({ message: 'Username and password are required' });
         }
-        // Find the user in the database
-        const user = await User.findOne({
-            where: { username }
-        });
-        // If user doesn't exist or password is incorrect
+        // Find user
+        const user = await User.findOne({ where: { username } });
         if (!user) {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
@@ -28,19 +24,20 @@ router.post('/login', async (req, res) => {
         if (!isValidPassword) {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
-        // Generate JWT token
-        const token = jwt.sign({
-            userId: user.id,
-            username: user.username
-        }, process.env.JWT_SECRET || 'fallback_secret', {
-            expiresIn: process.env.JWT_EXPIRATION || '1h'
-        });
-        // Return the token
+        // Define payload
+        const payload = { userId: user.id, username: user.username };
+        // Define options with explicit type
+        const options = {
+            expiresIn: parseInt(process.env.JWT_SECRET) || '1h',
+        };
+        // Generate token
+        const token = jwt.sign(payload, process.env.JWT_SECRET, // Cast to string to satisfy TypeScript
+        options);
         return res.json({ token });
     }
     catch (error) {
         console.error('Login error:', error);
-        return res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: 'Server error during login' });
     }
 });
 export default router;
