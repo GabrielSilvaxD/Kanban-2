@@ -7,6 +7,8 @@ import express from 'express';
 import routes from './routes/index.js';
 import { sequelize } from './models/index.js';
 
+
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 

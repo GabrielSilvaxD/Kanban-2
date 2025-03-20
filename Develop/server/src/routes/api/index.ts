@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import { ticketRouter } from './ticket-routes.js';
-import { userRouter } from './user-routes.js';
+import express from 'express';
+import ticketRouter from './ticket-routes.js';
+import userRouter from './user-routes.js';
 
-const router = Router();
+const router = express.Router();
 
 router.use('/tickets', ticketRouter);
 router.use('/users', userRouter);

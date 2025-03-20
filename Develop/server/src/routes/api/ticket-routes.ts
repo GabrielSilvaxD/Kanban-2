@@ -1,3 +1,5 @@
+
+
 import express from 'express';
 import {
   getAllTickets,
@@ -24,4 +26,4 @@ router.put('/:id', updateTicket);
 // DELETE /tickets/:id - Delete a ticket by id
 router.delete('/:id', deleteTicket);
 
-export { router as ticketRouter };
+export default router;
